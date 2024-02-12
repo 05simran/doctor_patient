@@ -1,0 +1,23 @@
+.cards_todo {
+    padding: 11px 18px;
+    height: 149px;
+    border-radius: 20px;
+    width: 300px;
+    color: black;
+    background-color: white;
+    font-size: 15px;
+    margin: 12px;
+    max-width: 400px; /* Adjust this value as needed */
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.card_main {
+    margin: 12px;
+    width: 90%;
+    justify-content: center;
+    display: flex;
+    padding: 12px;
+    flex-wrap: wrap;
+}

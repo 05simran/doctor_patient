@@ -1,0 +1,8 @@
+.main-todo {
+    align-items: center;
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+    background-color: #222;
+    flex-direction: column;
+}
