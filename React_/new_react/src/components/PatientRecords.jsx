@@ -11,9 +11,7 @@ const PatientRecords = () => {
 
     const fetchPatients = async () => {
         // try {
-        //     const response = await axios.get(
-        //         "http://localhost:5000/api/patients"
-        //     );
+        //     const response = await axios.get("http://localhost:5000/api/patients");
         //     setPatients(response.data);
         // } catch (error) {
         //     console.error("Error fetching patients:", error);
@@ -32,80 +30,77 @@ const PatientRecords = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        Patient Records
-                    </h1>
-                </div>
-            </header>
-            <main>
-                <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    <div className="px-4 py-6 sm:px-0">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white">
-                                <thead>
-                                    <tr>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Name
-                                        </th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Age
-                                        </th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Follow-up Date
-                                        </th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Actions
-                                        </th>
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+            <div className="w-full max-w-5xl bg-white shadow-lg rounded-lg p-6">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                    Patient Records
+                </h1>
+
+                {patients.length === 0 ? (
+                    <p className="text-center text-gray-500">
+                        No patient records found.
+                    </p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+                            <thead className="bg-indigo-600 text-white">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                                        Name
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                                        Age
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                                        Follow-up Date
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold text-center">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {patients.map((patient, index) => (
+                                    <tr
+                                        key={patient._id}
+                                        className={
+                                            index % 2 === 0
+                                                ? "bg-gray-50"
+                                                : "bg-white"
+                                        }
+                                    >
+                                        <td className="px-6 py-4 text-gray-800">
+                                            {patient.name}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {patient.age}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {patient.followUpDate || "N/A"}
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <Link
+                                                to={`/edit-patient/${patient._id}`}
+                                                className="text-blue-600 hover:text-blue-800 mr-4"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                onClick={() =>
+                                                    deletePatient(patient._id)
+                                                }
+                                                className="text-red-600 hover:text-red-800"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="bg-white">
-                                    {patients.map((patient) => (
-                                        <tr key={patient._id}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {patient.name}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">
-                                                    {patient.age}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">
-                                                    {patient.followUpDate ||
-                                                        "N/A"}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <Link
-                                                    to={`/edit-patient/${patient._id}`}
-                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                                >
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    onClick={() =>
-                                                        deletePatient(
-                                                            patient._id
-                                                        )
-                                                    }
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </main>
+                )}
+            </div>
         </div>
     );
 };

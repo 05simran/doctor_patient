@@ -1,42 +1,51 @@
 import { Link } from "react-router-dom";
+import { FaUserPlus, FaUsers } from "react-icons/fa";
 
 const Dashboard = () => {
     return (
-        <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        Dashboard
-                    </h1>
-                </div>
-            </header>
-            <main>
-                <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    <div className="px-4 py-6 sm:px-0">
-                        <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
-                            <div className="flex flex-col items-center justify-center h-full">
-                                <h2 className="text-2xl font-semibold mb-4">
-                                    Quick Actions
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+            <div className="w-full max-w-6xl bg-white shadow-md rounded-lg p-6">
+                <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
+                    Dashboard
+                </h1>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {/* View Patients Card */}
+                    <Link
+                        to="/patients"
+                        className="group block bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-lg shadow-md transform transition hover:scale-105"
+                    >
+                        <div className="flex items-center space-x-4">
+                            <FaUsers className="text-4xl" />
+                            <div>
+                                <h2 className="text-xl font-semibold">
+                                    View Patients
                                 </h2>
-                                <div className="space-x-4">
-                                    <Link
-                                        to="/patients"
-                                        className="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        View Patients
-                                    </Link>
-                                    <Link
-                                        to="/new-patient"
-                                        className="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        New Patient
-                                    </Link>
-                                </div>
+                                <p className="text-sm text-gray-200">
+                                    See all registered patients.
+                                </p>
                             </div>
                         </div>
-                    </div>
+                    </Link>
+
+                    {/* New Patient Card */}
+                    <Link
+                        to="/new-patient"
+                        className="group block bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg shadow-md transform transition hover:scale-105"
+                    >
+                        <div className="flex items-center space-x-4">
+                            <FaUserPlus className="text-4xl" />
+                            <div>
+                                <h2 className="text-xl font-semibold">
+                                    New Patient
+                                </h2>
+                                <p className="text-sm text-gray-200">
+                                    Register a new patient.
+                                </p>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
-            </main>
+            </div>
         </div>
     );
 };
