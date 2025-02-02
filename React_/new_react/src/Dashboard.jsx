@@ -3,7 +3,6 @@ import Sidebar from "./components/Sidebar";
 import PatientsView from "./components/patients/PatientsView";
 import MedicalDataManager from "./components/medical/MedicalDataManager";
 import InvoicePage from "./components/invoices/InvoicePage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PillIcon as Pills, CalendarDays, Activity } from "lucide-react";
 
 const Dashboard = () => {
@@ -49,22 +48,23 @@ const Dashboard = () => {
                     <div className="space-y-6">
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                             {stats.map((stat) => (
-                                <Card key={stat.title}>
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">
+                                <div
+                                    key={stat.title}
+                                    className="bg-white rounded-lg shadow p-6"
+                                >
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="text-sm font-medium text-gray-500">
                                             {stat.title}
-                                        </CardTitle>
-                                        <stat.icon className="h-4 w-4 text-muted-foreground" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">
-                                            {stat.value}
-                                        </div>
-                                        <p className="text-xs text-green-500">
-                                            {stat.trend} from last month
-                                        </p>
-                                    </CardContent>
-                                </Card>
+                                        </h3>
+                                        <stat.icon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <div className="text-2xl font-bold">
+                                        {stat.value}
+                                    </div>
+                                    <p className="text-xs text-green-500">
+                                        {stat.trend} from last month
+                                    </p>
+                                </div>
                             ))}
                         </div>
                         {/* Add more dashboard content here */}
