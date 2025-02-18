@@ -1,102 +1,170 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+
+import { useState } from "react";
 
 // Simulated database
 const db = {
-  problems: [],
-  medications: [],
-  symptoms: [],
-}
+    medicalData: [
+        {
+            id: 1,
+            problem: "Hypertension",
+            medicines: ["Lisinopril", "Amlodipine"],
+            symptoms: ["Headache", "Dizziness", "Shortness of breath"],
+        },
+        {
+            id: 2,
+            problem: "Diabetes Type 2",
+            medicines: ["Metformin", "Gliclazide"],
+            symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
+        },
+        {
+            id: 3,
+            problem: "Asthma",
+            medicines: ["Albuterol", "Fluticasone"],
+            symptoms: ["Wheezing", "Coughing", "Chest tightness"],
+        },
+    ],
+};
 
 const MedicalDataManager = () => {
-  const [activeTab, setActiveTab] = useState("problems")
-  const [newItem, setNewItem] = useState({ name: "", description: "" })
-  const [items, setItems] = useState([])
+    const [medicalData, setMedicalData] = useState(db.medicalData);
+    const [newItem, setNewItem] = useState({
+        problem: "",
+        medicines: "",
+        symptoms: "",
+    });
 
-  useEffect(() => {
-    setItems(db[activeTab])
-  }, [activeTab])
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (newItem.problem && newItem.medicines && newItem.symptoms) {
+            const updatedMedicalData = [
+                ...medicalData,
+                {
+                    id: Date.now(),
+                    problem: newItem.problem,
+                    medicines: newItem.medicines
+                        .split(",")
+                        .map((med) => med.trim()),
+                    symptoms: newItem.symptoms
+                        .split(",")
+                        .map((sym) => sym.trim()),
+                },
+            ];
+            setMedicalData(updatedMedicalData);
+            db.medicalData = updatedMedicalData;
+            setNewItem({ problem: "", medicines: "", symptoms: "" });
+        }
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (newItem.name && newItem.description) {
-      const updatedItems = [...items, { ...newItem, id: Date.now() }]
-      db[activeTab] = updatedItems
-      setItems(updatedItems)
-      setNewItem({ name: "", description: "" })
-    }
-  }
+    return (
+        <div className="space-y-4 p-8">
+            <div className="bg-white shadow rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">Manage Medical Data</h2>
+                <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+                    <div>
+                        <label
+                            htmlFor="problem"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Problem
+                        </label>
+                        <input
+                            id="problem"
+                            type="text"
+                            value={newItem.problem}
+                            onChange={(e) =>
+                                setNewItem({
+                                    ...newItem,
+                                    problem: e.target.value,
+                                })
+                            }
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="medicines"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Medicines (comma-separated)
+                        </label>
+                        <input
+                            id="medicines"
+                            type="text"
+                            value={newItem.medicines}
+                            onChange={(e) =>
+                                setNewItem({
+                                    ...newItem,
+                                    medicines: e.target.value,
+                                })
+                            }
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="symptoms"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Symptoms (comma-separated)
+                        </label>
+                        <input
+                            id="symptoms"
+                            type="text"
+                            value={newItem.symptoms}
+                            onChange={(e) =>
+                                setNewItem({
+                                    ...newItem,
+                                    symptoms: e.target.value,
+                                })
+                            }
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
+                    >
+                        Add Medical Data
+                    </button>
+                </form>
 
-  return (
-    <div className="space-y-4 p-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Manage Medical Data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-2 mb-4">
-            <Button variant={activeTab === "problems" ? "default" : "outline"} onClick={() => setActiveTab("problems")}>
-              Problems
-            </Button>
-            <Button
-              variant={activeTab === "medications" ? "default" : "outline"}
-              onClick={() => setActiveTab("medications")}
-            >
-              Medications
-            </Button>
-            <Button variant={activeTab === "symptoms" ? "default" : "outline"} onClick={() => setActiveTab("symptoms")}>
-              Symptoms
-            </Button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={newItem.name}
-                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                required
-              />
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Problem
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Medicines
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Symptoms
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {medicalData.map((item) => (
+                            <tr key={item.id}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.problem}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.medicines.join(", ")}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.symptoms.join(", ")}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={newItem.description}
-                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                required
-              />
-            </div>
-            <Button type="submit">Add {activeTab.slice(0, -1)}</Button>
-          </form>
+        </div>
+    );
+};
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-export default MedicalDataManager
-
+export default MedicalDataManager;

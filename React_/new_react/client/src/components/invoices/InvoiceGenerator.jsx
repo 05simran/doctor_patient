@@ -1,164 +1,134 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+"use client";
 
-const InvoiceGenerator = ({ patient }) => {
-  const [invoice, setInvoice] = useState({
-    patientName: patient?.name || "",
-    medicine: "",
-    amount: "",
-    daysToTake: "",
-    nextFollowUp: new Date(),
-  })
+import { useState } from "react";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
-  const [generatedInvoice, setGeneratedInvoice] = useState(null)
+const InvoiceGenerator = ({ onSubmit }) => {
+    const [invoice, setInvoice] = useState({
+        invoiceNumber: "",
+        patientName: "",
+        date: format(new Date(), "yyyy-MM-dd"),
+        amount: "",
+        status: "Pending",
+    });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setInvoice((prev) => ({ ...prev, [name]: value }))
-  }
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInvoice((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleDateChange = (date) => {
-    setInvoice((prev) => ({ ...prev, nextFollowUp: date }))
-  }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(invoice);
+    };
 
-  const generateInvoice = () => {
-    const newInvoice = {
-      ...invoice,
-      invoiceNumber: Math.floor(100000 + Math.random() * 900000),
-      date: new Date().toLocaleDateString(),
-    }
-    setGeneratedInvoice(newInvoice)
-  }
-
-  return (
-    <div className="space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Generate Invoice</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="patientName">Patient Name</Label>
-            <Input
-              id="patientName"
-              name="patientName"
-              value={invoice.patientName}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="medicine">Prescribed Medicine</Label>
-            <Input id="medicine" name="medicine" value={invoice.medicine} onChange={handleInputChange} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              name="amount"
-              type="number"
-              value={invoice.amount}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="daysToTake">Days to Take Medicine</Label>
-            <Input
-              id="daysToTake"
-              name="daysToTake"
-              type="number"
-              value={invoice.daysToTake}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="nextFollowUp">Next Follow-up Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={`w-full justify-start text-left font-normal ${
-                    !invoice.nextFollowUp && "text-muted-foreground"
-                  }`}
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <label
+                    htmlFor="invoiceNumber"
+                    className="block text-sm font-medium text-gray-700"
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {invoice.nextFollowUp ? format(invoice.nextFollowUp, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={invoice.nextFollowUp} onSelect={handleDateChange} initialFocus />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={generateInvoice}>Generate Invoice</Button>
-        </CardFooter>
-      </Card>
+                    Invoice Number
+                </label>
+                <input
+                    id="invoiceNumber"
+                    name="invoiceNumber"
+                    type="text"
+                    value={invoice.invoiceNumber}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    required
+                />
+            </div>
+            <div>
+                <label
+                    htmlFor="patientName"
+                    className="block text-sm font-medium text-gray-700"
+                >
+                    Patient Name
+                </label>
+                <input
+                    id="patientName"
+                    name="patientName"
+                    type="text"
+                    value={invoice.patientName}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    required
+                />
+            </div>
+            <div>
+                <label
+                    htmlFor="date"
+                    className="block text-sm font-medium text-gray-700"
+                >
+                    Date
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <CalendarIcon className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                        id="date"
+                        name="date"
+                        type="date"
+                        value={invoice.date}
+                        onChange={handleInputChange}
+                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                        required
+                    />
+                </div>
+            </div>
+            <div>
+                <label
+                    htmlFor="amount"
+                    className="block text-sm font-medium text-gray-700"
+                >
+                    Amount
+                </label>
+                <input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    step="0.01"
+                    value={invoice.amount}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    required
+                />
+            </div>
+            <div>
+                <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700"
+                >
+                    Status
+                </label>
+                <select
+                    id="status"
+                    name="status"
+                    value={invoice.status}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    required
+                >
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+            </div>
+            <div className="mt-6">
+                <button
+                    type="submit"
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Generate Invoice
+                </button>
+            </div>
+        </form>
+    );
+};
 
-      {generatedInvoice && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Generated Invoice</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Invoice Detail</TableHead>
-                  <TableHead>Value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Invoice Number</TableCell>
-                  <TableCell>{generatedInvoice.invoiceNumber}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Date</TableCell>
-                  <TableCell>{generatedInvoice.date}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Patient Name</TableCell>
-                  <TableCell>{generatedInvoice.patientName}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Prescribed Medicine</TableCell>
-                  <TableCell>{generatedInvoice.medicine}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Amount</TableCell>
-                  <TableCell>${generatedInvoice.amount}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Days to Take Medicine</TableCell>
-                  <TableCell>{generatedInvoice.daysToTake} days</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Next Follow-up Date</TableCell>
-                  <TableCell>{format(generatedInvoice.nextFollowUp, "PPP")}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => window.print()}>Print Invoice</Button>
-          </CardFooter>
-        </Card>
-      )}
-    </div>
-  )
-}
-
-export default InvoiceGenerator
-
+export default InvoiceGenerator;

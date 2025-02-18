@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserPlus, Search, Filter, MoreVertical } from "lucide-react";
-import AddEditPatientForm from "./AddEditPatientForm";
-import ViewPatientModal from "./ViewPatientModal";
+import AddEditPatientForm from "../patients/AddEditPatientForm";
+import ViewPatientModal from "../patients/AddEditPatientForm";
 import InvoiceGenerator from "../invoices/InvoiceGenerator";
 
 const PatientsView = () => {

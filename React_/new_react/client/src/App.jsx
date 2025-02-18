@@ -1,20 +1,19 @@
-import { useState } from "react"
-import AuthPage from "./components/auth/AuthPage"
-import Dashboard from "./Dashboard"
-
+import { useState } from "react";
+import AuthPage from "./components/auth/AuthPage";
+import Dashboard from "./Dashboard";
+import "./index.css";
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleAuth = () => {
-    setIsAuthenticated(true)
-  }
+    const handleAuth = () => {
+        setIsAuthenticated(true);
+    };
 
-  if (!isAuthenticated) {
-    return <AuthPage onAuth={handleAuth} />
-  }
+    if (!isAuthenticated) {
+        return <AuthPage onAuth={handleAuth} />;
+    }
 
-  return <Dashboard />
-}
+    return <Dashboard />;
+};
 
-export default App
-
+export default App;

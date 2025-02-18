@@ -1,207 +1,240 @@
+"use client";
+
 import { useState } from "react";
-import { Search, Plus, Printer, Eye } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
-// Mock data for invoices
-const mockInvoices = [
-    {
-        id: 1,
-        invoiceNumber: "INV-001",
-        patientName: "John Doe",
-        date: "2023-05-20",
-        amount: 150.0,
-        status: "Paid",
-    },
-    {
-        id: 2,
-        invoiceNumber: "INV-002",
-        patientName: "Jane Smith",
-        date: "2023-05-21",
-        amount: 200.0,
-        status: "Pending",
-    },
-    {
-        id: 3,
-        invoiceNumber: "INV-003",
-        patientName: "Bob Johnson",
-        date: "2023-05-22",
-        amount: 175.0,
-        status: "Overdue",
-    },
-];
+const InvoiceGenerator = ({ patient }) => {
+    const [invoice, setInvoice] = useState({
+        patientName: patient?.name || "",
+        medicine: "",
+        amount: "",
+        daysToTake: "",
+        nextFollowUp: new Date(),
+    });
 
-const InvoicePage = () => {
-    const [invoices, setInvoices] = useState(mockInvoices);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [generatedInvoice, setGeneratedInvoice] = useState(null);
 
-    const filteredInvoices = invoices.filter(
-        (invoice) =>
-            invoice.patientName
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase()) ||
-            invoice.invoiceNumber
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase())
-    );
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInvoice((prev) => ({ ...prev, [name]: value }));
+    };
 
-    // const handleNewInvoice = (newInvoice) => {
-    //     setInvoices([
-    //         ...invoices,
-    //         { ...newInvoice, id: invoices.length + 1, status: "Pending" },
-    //     ]);
-    // };
+    const handleDateChange = (e) => {
+        setInvoice((prev) => ({
+            ...prev,
+            nextFollowUp: new Date(e.target.value),
+        }));
+    };
 
-    const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
-            case "paid":
-                return "bg-green-100 text-green-800";
-            case "pending":
-                return "bg-yellow-100 text-yellow-800";
-            case "overdue":
-                return "bg-red-100 text-red-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
+    const generateInvoice = () => {
+        const newInvoice = {
+            ...invoice,
+            invoiceNumber: Math.floor(100000 + Math.random() * 900000),
+            date: new Date().toLocaleDateString(),
+        };
+        setGeneratedInvoice(newInvoice);
     };
 
     return (
-        <div className="space-y-4 p-8">
-            <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold">Invoices</h2>
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-600"
-                        onClick={() => {
-                            /* Open new invoice dialog */
-                        }}
-                    >
-                        <Plus className="h-4 w-4" />
-                        New Invoice
-                    </button>
-                </div>
-                <div className="flex items-center space-x-2 mb-4">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <div className="space-y-8">
+            <div className="bg-white shadow rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-6">Generate Invoice</h2>
+                <div className="space-y-4">
+                    <div>
+                        <label
+                            htmlFor="patientName"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Patient Name
+                        </label>
                         <input
+                            id="patientName"
+                            name="patientName"
                             type="text"
-                            placeholder="Search invoices..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border rounded-md"
+                            value={invoice.patientName}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
                         />
                     </div>
+                    <div>
+                        <label
+                            htmlFor="medicine"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Prescribed Medicine
+                        </label>
+                        <input
+                            id="medicine"
+                            name="medicine"
+                            type="text"
+                            value={invoice.medicine}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="amount"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Amount
+                        </label>
+                        <input
+                            id="amount"
+                            name="amount"
+                            type="number"
+                            value={invoice.amount}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="daysToTake"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Days to Take Medicine
+                        </label>
+                        <input
+                            id="daysToTake"
+                            name="daysToTake"
+                            type="number"
+                            value={invoice.daysToTake}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="nextFollowUp"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Next Follow-up Date
+                        </label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                id="nextFollowUp"
+                                name="nextFollowUp"
+                                type="date"
+                                value={format(
+                                    invoice.nextFollowUp,
+                                    "yyyy-MM-dd"
+                                )}
+                                onChange={handleDateChange}
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                            />
+                        </div>
+                    </div>
                 </div>
-                <table className="min-w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left">Invoice #</th>
-                            <th className="text-left">Patient Name</th>
-                            <th className="text-left">Date</th>
-                            <th className="text-left">Amount</th>
-                            <th className="text-left">Status</th>
-                            <th className="text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredInvoices.map((invoice) => (
-                            <tr key={invoice.id} className="border-t">
-                                <td className="py-2 font-medium">
-                                    {invoice.invoiceNumber}
-                                </td>
-                                <td className="py-2">{invoice.patientName}</td>
-                                <td className="py-2">{invoice.date}</td>
-                                <td className="py-2">
-                                    ${invoice.amount.toFixed(2)}
-                                </td>
-                                <td className="py-2">
-                                    <span
-                                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                                            invoice.status
-                                        )}`}
-                                    >
-                                        {invoice.status}
-                                    </span>
-                                </td>
-                                <td className="py-2 text-right">
-                                    <button
-                                        className="text-gray-600 hover:text-gray-900 mr-2"
-                                        onClick={() =>
-                                            setSelectedInvoice(invoice)
-                                        }
-                                    >
-                                        <Eye className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        className="text-gray-600 hover:text-gray-900"
-                                        onClick={() => window.print()}
-                                    >
-                                        <Printer className="h-4 w-4" />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="mt-6">
+                    <button
+                        onClick={generateInvoice}
+                        className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Generate Invoice
+                    </button>
+                </div>
             </div>
 
-            {selectedInvoice && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg max-w-2xl w-full">
-                        <h2 className="text-2xl font-bold mb-4">
-                            Invoice Details
-                        </h2>
-                        <table className="min-w-full mb-4">
-                            <tbody>
-                                <tr>
-                                    <td className="font-medium">
-                                        Invoice Number
-                                    </td>
-                                    <td>{selectedInvoice.invoiceNumber}</td>
-                                </tr>
-                                <tr>
-                                    <td className="font-medium">
-                                        Patient Name
-                                    </td>
-                                    <td>{selectedInvoice.patientName}</td>
-                                </tr>
-                                <tr>
-                                    <td className="font-medium">Date</td>
-                                    <td>{selectedInvoice.date}</td>
-                                </tr>
-                                <tr>
-                                    <td className="font-medium">Amount</td>
-                                    <td>
-                                        ${selectedInvoice.amount.toFixed(2)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="font-medium">Status</td>
-                                    <td>
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                                                selectedInvoice.status
-                                            )}`}
-                                        >
-                                            {selectedInvoice.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div className="flex justify-end space-x-2">
-                            <button
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                onClick={() => window.print()}
-                            >
-                                Print Invoice
-                            </button>
-                            <button
-                                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
-                                onClick={() => setSelectedInvoice(null)}
-                            >
-                                Close
-                            </button>
-                        </div>
+            {generatedInvoice && (
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6">
+                        Generated Invoice
+                    </h2>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
+                                    Invoice Detail
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
+                                    Value
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Invoice Number
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {generatedInvoice.invoiceNumber}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Date
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {generatedInvoice.date}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Patient Name
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {generatedInvoice.patientName}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Prescribed Medicine
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {generatedInvoice.medicine}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Amount
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    ${generatedInvoice.amount}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Days to Take Medicine
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {generatedInvoice.daysToTake} days
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Next Follow-up Date
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {format(
+                                        generatedInvoice.nextFollowUp,
+                                        "PPP"
+                                    )}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className="mt-6">
+                        <button
+                            onClick={() => window.print()}
+                            className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Print Invoice
+                        </button>
                     </div>
                 </div>
             )}
@@ -209,4 +242,4 @@ const InvoicePage = () => {
     );
 };
 
-export default InvoicePage;
+export default InvoiceGenerator;

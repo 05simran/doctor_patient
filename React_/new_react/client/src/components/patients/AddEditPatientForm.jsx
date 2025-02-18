@@ -1,205 +1,274 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+"use client";
+
+import { useState, useEffect } from "react";
 
 // Simulated database access
-const getOptions = (category) => {
-  const db = {
-    problems: [
-      { id: 1, name: "Hypertension" },
-      { id: 2, name: "Diabetes" },
-      { id: 3, name: "Asthma" },
-    ],
-    medications: [
-      { id: 1, name: "Lisinopril" },
-      { id: 2, name: "Metformin" },
-      { id: 3, name: "Albuterol" },
-    ],
-    symptoms: [
-      { id: 1, name: "Headache" },
-      { id: 2, name: "Fatigue" },
-      { id: 3, name: "Shortness of breath" },
-    ],
-  }
-  return db[category] || []
-}
+const getMedicalData = () => {
+    // In a real application, this would be an API call
+    return [
+        {
+            id: 1,
+            problem: "Hypertension",
+            medicines: ["Lisinopril", "Amlodipine"],
+            symptoms: ["Headache", "Dizziness", "Shortness of breath"],
+        },
+        {
+            id: 2,
+            problem: "Diabetes Type 2",
+            medicines: ["Metformin", "Gliclazide"],
+            symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
+        },
+        {
+            id: 3,
+            problem: "Asthma",
+            medicines: ["Albuterol", "Fluticasone"],
+            symptoms: ["Wheezing", "Coughing", "Chest tightness"],
+        },
+    ];
+};
 
 const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
-  const [patientData, setPatientData] = useState(
-    patient || {
-      name: "",
-      age: "",
-      gender: "",
-      email: "",
-      phone: "",
-      problem: "",
-      medication: "",
-      symptoms: "",
-      otherNotes: "",
-    },
-  )
+    const [patientData, setPatientData] = useState(
+        patient || {
+            name: "",
+            age: "",
+            gender: "",
+            phone: "",
+            problem: "",
+            medicines: [],
+            symptoms: [],
+            otherNotes: "",
+        }
+    );
 
-  const [problems, setProblems] = useState([])
-  const [medications, setMedications] = useState([])
-  const [symptoms, setSymptoms] = useState([])
+    const [medicalData, setMedicalData] = useState([]);
 
-  useEffect(() => {
-    setProblems(getOptions("problems"))
-    setMedications(getOptions("medications"))
-    setSymptoms(getOptions("symptoms"))
-  }, [])
+    useEffect(() => {
+        setMedicalData(getMedicalData());
+    }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setPatientData((prev) => ({ ...prev, [name]: value }))
-  }
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setPatientData((prev) => ({ ...prev, [name]: value }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onSubmit(patientData)
-  }
+        if (name === "problem") {
+            const selectedProblem = medicalData.find(
+                (item) => item.problem === value
+            );
+            if (selectedProblem) {
+                setPatientData((prev) => ({
+                    ...prev,
+                    medicines: selectedProblem.medicines,
+                    symptoms: selectedProblem.symptoms,
+                }));
+            } else {
+                setPatientData((prev) => ({
+                    ...prev,
+                    medicines: [],
+                    symptoms: [],
+                }));
+            }
+        }
+    };
 
-  return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>{patient ? "Edit Patient" : "Add New Patient"}</CardTitle>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" value={patientData.name} onChange={handleInputChange} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
-              <Input id="age" name="age" type="number" value={patientData.age} onChange={handleInputChange} required />
-            </div>
-          </div>
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(patientData);
+    };
 
-          <div className="space-y-2">
-            <Label htmlFor="gender">Gender</Label>
-            <Select
-              name="gender"
-              value={patientData.gender}
-              onValueChange={(value) => setPatientData((prev) => ({ ...prev, gender: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    return (
+        <div className="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                {patient ? "Edit Patient" : "Add New Patient"}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label
+                            htmlFor="name"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Name
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            type="text"
+                            value={patientData.name}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="age"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Age
+                        </label>
+                        <input
+                            id="age"
+                            name="age"
+                            type="number"
+                            value={patientData.age}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={patientData.email}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label
+                            htmlFor="gender"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Gender
+                        </label>
+                        <select
+                            id="gender"
+                            name="gender"
+                            value={patientData.gender}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        >
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="phone"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Phone
+                        </label>
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            value={patientData.phone}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" name="phone" value={patientData.phone} onChange={handleInputChange} required />
-          </div>
+                <div>
+                    <label
+                        htmlFor="problem"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Problem
+                    </label>
+                    <select
+                        id="problem"
+                        name="problem"
+                        value={patientData.problem}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    >
+                        <option value="">Select problem</option>
+                        {medicalData.map((item) => (
+                            <option key={item.id} value={item.problem}>
+                                {item.problem}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="problem">Problem</Label>
-            <Select
-              name="problem"
-              value={patientData.problem}
-              onValueChange={(value) => setPatientData((prev) => ({ ...prev, problem: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select problem" />
-              </SelectTrigger>
-              <SelectContent>
-                {problems.map((problem) => (
-                  <SelectItem key={problem.id} value={problem.name}>
-                    {problem.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="other">Other (specify in notes)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <div>
+                    <label
+                        htmlFor="medicines"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Medicines
+                    </label>
+                    <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px]">
+                        {patientData.medicines.length > 0 ? (
+                            patientData.medicines.map((medicine, index) => (
+                                <span
+                                    key={index}
+                                    className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 mb-2"
+                                >
+                                    {medicine}
+                                </span>
+                            ))
+                        ) : (
+                            <span className="text-gray-500">
+                                No medicines selected
+                            </span>
+                        )}
+                    </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="medication">Medication</Label>
-            <Select
-              name="medication"
-              value={patientData.medication}
-              onValueChange={(value) => setPatientData((prev) => ({ ...prev, medication: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select medication" />
-              </SelectTrigger>
-              <SelectContent>
-                {medications.map((medication) => (
-                  <SelectItem key={medication.id} value={medication.name}>
-                    {medication.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="other">Other (specify in notes)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <div>
+                    <label
+                        htmlFor="symptoms"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Symptoms
+                    </label>
+                    <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px]">
+                        {patientData.symptoms.length > 0 ? (
+                            patientData.symptoms.map((symptom, index) => (
+                                <span
+                                    key={index}
+                                    className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm mr-2 mb-2"
+                                >
+                                    {symptom}
+                                </span>
+                            ))
+                        ) : (
+                            <span className="text-gray-500">
+                                No symptoms selected
+                            </span>
+                        )}
+                    </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="symptoms">Symptoms</Label>
-            <Select
-              name="symptoms"
-              value={patientData.symptoms}
-              onValueChange={(value) => setPatientData((prev) => ({ ...prev, symptoms: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select symptoms" />
-              </SelectTrigger>
-              <SelectContent>
-                {symptoms.map((symptom) => (
-                  <SelectItem key={symptom.id} value={symptom.name}>
-                    {symptom.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="other">Other (specify in notes)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <div>
+                    <label
+                        htmlFor="otherNotes"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Other Notes
+                    </label>
+                    <textarea
+                        id="otherNotes"
+                        name="otherNotes"
+                        value={patientData.otherNotes}
+                        onChange={handleInputChange}
+                        rows="3"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    ></textarea>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="otherNotes">Other Notes</Label>
-            <Textarea
-              id="otherNotes"
-              name="otherNotes"
-              value={patientData.otherNotes}
-              onChange={handleInputChange}
-              placeholder="Enter any additional information here..."
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit">{patient ? "Update Patient" : "Add Patient"}</Button>
-        </CardFooter>
-      </form>
-    </Card>
-  )
-}
+                <div className="flex justify-end space-x-2">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        {patient ? "Update Patient" : "Add Patient"}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
 
-export default AddEditPatientForm
-
+export default AddEditPatientForm;
