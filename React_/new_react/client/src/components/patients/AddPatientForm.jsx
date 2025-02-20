@@ -42,6 +42,23 @@ const getMedicineRecommendations = async (problem) => {
 };
 
 const AddPatientForm = ({ onSubmit, onCancel }) => {
+    const [patients, setPatients] = useState([]);
+
+    useEffect(() => {
+        const fetchPatients = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/patients");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch patients");
+                }
+                const data = await response.json();
+                setPatients(data);
+            } catch (error) {
+                console.error("Error fetching patients:", error);
+            }
+        };
+        fetchPatients();
+    }, []);
     const [patientData, setPatientData] = useState({
         name: "",
         age: "",
@@ -71,9 +88,24 @@ const AddPatientForm = ({ onSubmit, onCancel }) => {
         setPatientData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(patientData);
+        try {
+            const response = await fetch("http://localhost:5000/api/patients", {
+                method: patients ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(patientData),
+            });
+            if (!response.ok) {
+                throw new Error("Failed to save patient");
+            }
+            const data = await response.json();
+            onSubmit(data);
+        } catch (error) {
+            console.error("Error saving patient:", error);
+        }
     };
 
     return (

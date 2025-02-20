@@ -1,31 +1,4 @@
-"use client";
-
 import { useState, useEffect } from "react";
-
-// Simulated database access
-const getMedicalData = () => {
-    // In a real application, this would be an API call
-    return [
-        {
-            id: 1,
-            problem: "Hypertension",
-            medicines: ["Lisinopril", "Amlodipine"],
-            symptoms: ["Headache", "Dizziness", "Shortness of breath"],
-        },
-        {
-            id: 2,
-            problem: "Diabetes Type 2",
-            medicines: ["Metformin", "Gliclazide"],
-            symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
-        },
-        {
-            id: 3,
-            problem: "Asthma",
-            medicines: ["Albuterol", "Fluticasone"],
-            symptoms: ["Wheezing", "Coughing", "Chest tightness"],
-        },
-    ];
-};
 
 const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
     const [patientData, setPatientData] = useState(
@@ -44,7 +17,27 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
     const [medicalData, setMedicalData] = useState([]);
 
     useEffect(() => {
-        setMedicalData(getMedicalData());
+        // Simulated medical data (replace with API call if needed)
+        setMedicalData([
+            {
+                id: 1,
+                problem: "Hypertension",
+                medicines: ["Lisinopril", "Amlodipine"],
+                symptoms: ["Headache", "Dizziness", "Shortness of breath"],
+            },
+            {
+                id: 2,
+                problem: "Diabetes Type 2",
+                medicines: ["Metformin", "Gliclazide"],
+                symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
+            },
+            {
+                id: 3,
+                problem: "Asthma",
+                medicines: ["Albuterol", "Fluticasone"],
+                symptoms: ["Wheezing", "Coughing", "Chest tightness"],
+            },
+        ]);
     }, []);
 
     const handleInputChange = (e) => {
@@ -71,9 +64,31 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(patientData);
+        try {
+            const url = patient
+                ? `http://localhost:5000/api/patients/${patient.id}`
+                : "http://localhost:5000/api/patients";
+            const method = patient ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(patientData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to save patient");
+            }
+
+            const data = await response.json();
+            onSubmit(data);
+        } catch (error) {
+            console.error("Error saving patient:", error);
+        }
     };
 
     return (
@@ -266,9 +281,18 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                         {patient ? "Update Patient" : "Add Patient"}
                     </button>
                 </div>
+
             </form>
         </div>
     );
 };
 
 export default AddEditPatientForm;
+
+
+
+
+
+
+
+

@@ -65,6 +65,11 @@ const InvoicePrint = ({ generatedInvoice }) => {
                                 </TableCell>
                             </TableRow>
                             <TableRow>
+                                <TableCell className="font-medium">Status</TableCell>
+                                <TableCell>{generatedInvoice.status}</TableCell>
+                            </TableRow>
+
+                            <TableRow>
                                 <TableCell className="font-medium">
                                     Amount
                                 </TableCell>

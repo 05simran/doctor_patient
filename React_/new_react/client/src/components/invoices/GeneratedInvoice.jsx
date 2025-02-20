@@ -19,9 +19,12 @@ const GeneratedInvoice = ({ invoice, onClose, isEditing }) => {
         setEditedInvoice((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSave = () => {
-        // Here you would typically update the invoice in your database
-        console.log("Saving edited invoice:", editedInvoice);
+    const handleSave = async () => {
+        await fetch(`http://localhost:5000/api/invoices/${invoice._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editedInvoice),
+        });
         onClose();
     };
 
@@ -113,7 +116,7 @@ const GeneratedInvoice = ({ invoice, onClose, isEditing }) => {
                                             className="border rounded px-2 py-1 w-full"
                                         />
                                     ) : (
-                                        `$${invoice.amount.toFixed(2)}`
+                                        `${invoice.amount.toFixed(2)}`
                                     )}
                                 </td>
                             </tr>

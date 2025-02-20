@@ -1,59 +1,61 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Simulated database
-const db = {
-    medicalData: [
-        {
-            id: 1,
-            problem: "Hypertension",
-            medicines: ["Lisinopril", "Amlodipine"],
-            symptoms: ["Headache", "Dizziness", "Shortness of breath"],
-        },
-        {
-            id: 2,
-            problem: "Diabetes Type 2",
-            medicines: ["Metformin", "Gliclazide"],
-            symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
-        },
-        {
-            id: 3,
-            problem: "Asthma",
-            medicines: ["Albuterol", "Fluticasone"],
-            symptoms: ["Wheezing", "Coughing", "Chest tightness"],
-        },
-    ],
-};
+// const db = {
+//     medicalData: [
+//         {
+//             id: 1,
+//             problem: "Hypertension",
+//             medicines: ["Lisinopril", "Amlodipine"],
+//             symptoms: ["Headache", "Dizziness", "Shortness of breath"],
+//         },
+//         {
+//             id: 2,
+//             problem: "Diabetes Type 2",
+//             medicines: ["Metformin", "Gliclazide"],
+//             symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
+//         },
+//         {
+//             id: 3,
+//             problem: "Asthma",
+//             medicines: ["Albuterol", "Fluticasone"],
+//             symptoms: ["Wheezing", "Coughing", "Chest tightness"],
+//         },
+//     ],
+// };
 
 const MedicalDataManager = () => {
-    const [medicalData, setMedicalData] = useState(db.medicalData);
+    const [medicalData, setMedicalData] = useState([]);
     const [newItem, setNewItem] = useState({
         problem: "",
         medicines: "",
         symptoms: "",
     });
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        fetchMedicalData();
+    }, []);
+
+    const fetchMedicalData = async () => {
+        const response = await fetch("http://localhost:5000/api/medical-data");
+        const data = await response.json();
+        setMedicalData(data);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (newItem.problem && newItem.medicines && newItem.symptoms) {
-            const updatedMedicalData = [
-                ...medicalData,
-                {
-                    id: Date.now(),
-                    problem: newItem.problem,
-                    medicines: newItem.medicines
-                        .split(",")
-                        .map((med) => med.trim()),
-                    symptoms: newItem.symptoms
-                        .split(",")
-                        .map((sym) => sym.trim()),
-                },
-            ];
-            setMedicalData(updatedMedicalData);
-            db.medicalData = updatedMedicalData;
-            setNewItem({ problem: "", medicines: "", symptoms: "" });
-        }
+        const newEntry = {
+            problem: newItem.problem,
+            medicines: newItem.medicines.split(",").map(med => med.trim()),
+            symptoms: newItem.symptoms.split(",").map(sym => sym.trim()),
+        };
+        await fetch("http://localhost:5000/api/medical-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newEntry),
+        });
+        fetchMedicalData();
+        setNewItem({ problem: "", medicines: "", symptoms: "" });
     };
 
     return (

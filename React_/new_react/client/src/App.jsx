@@ -1,19 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthPage from "./components/auth/AuthPage";
 import Dashboard from "./Dashboard";
-import "./index.css";
+
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
 
     const handleAuth = () => {
         setIsAuthenticated(true);
     };
 
-    if (!isAuthenticated) {
-        return <AuthPage onAuth={handleAuth} />;
-    }
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+    };
 
-    return <Dashboard />;
+    return isAuthenticated ? (
+        <Dashboard onLogout={handleLogout} />
+    ) : (
+        <AuthPage onAuth={handleAuth} />
+    );
 };
 
 export default App;
