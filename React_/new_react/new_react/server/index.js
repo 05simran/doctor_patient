@@ -18,12 +18,17 @@ dotenv.config({ path: path.resolve(__dirname, "./.env") });
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log(err));
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.log(err));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/invoices", invoiceRoutes);
