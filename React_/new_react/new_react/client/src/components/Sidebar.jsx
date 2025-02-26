@@ -2,7 +2,6 @@ import {
     LayoutDashboard,
     Users,
     PillIcon as Pills,
-    Settings,
     Menu,
     Database,
     FileText,
@@ -15,7 +14,6 @@ const Sidebar = ({ className, onNavigate }) => {
         { icon: Database, label: "Medical Data", view: "medicalData" },
         { icon: FileText, label: "Invoices", view: "invoices" },
         { icon: Pills, label: "Medicine", view: "medicine" },
-        { icon: Settings, label: "Settings", view: "settings" },
     ];
 
     return (

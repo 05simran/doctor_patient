@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Printer, X } from "lucide-react";
 
@@ -19,12 +21,9 @@ const GeneratedInvoice = ({ invoice, onClose, isEditing }) => {
         setEditedInvoice((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSave = async () => {
-        await fetch(`http://localhost:5000/api/invoices/${invoice._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(editedInvoice),
-        });
+    const handleSave = () => {
+        // Here you would typically update the invoice in your database
+        console.log("Saving edited invoice:", editedInvoice);
         onClose();
     };
 
@@ -104,6 +103,88 @@ const GeneratedInvoice = ({ invoice, onClose, isEditing }) => {
                             </tr>
                             <tr>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Patient Age
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {isEditing ? (
+                                        <input
+                                            type="number"
+                                            name="patientAge"
+                                            value={editedInvoice.patientAge}
+                                            onChange={handleInputChange}
+                                            className="border rounded px-2 py-1 w-full"
+                                        />
+                                    ) : (
+                                        invoice.patientAge
+                                    )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Medicines
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            name="medicines"
+                                            value={editedInvoice.medicines.join(
+                                                ", "
+                                            )}
+                                            onChange={(e) =>
+                                                setEditedInvoice((prev) => ({
+                                                    ...prev,
+                                                    medicines:
+                                                        e.target.value.split(
+                                                            ", "
+                                                        ),
+                                                }))
+                                            }
+                                            className="border rounded px-2 py-1 w-full"
+                                        />
+                                    ) : (
+                                        invoice.medicines.join(", ")
+                                    )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Dosage
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            name="dosage"
+                                            value={editedInvoice.dosage}
+                                            onChange={handleInputChange}
+                                            className="border rounded px-2 py-1 w-full"
+                                        />
+                                    ) : (
+                                        invoice.dosage
+                                    )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Frequency
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            name="frequency"
+                                            value={editedInvoice.frequency}
+                                            onChange={handleInputChange}
+                                            className="border rounded px-2 py-1 w-full"
+                                        />
+                                    ) : (
+                                        invoice.frequency
+                                    )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     Amount
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -116,7 +197,25 @@ const GeneratedInvoice = ({ invoice, onClose, isEditing }) => {
                                             className="border rounded px-2 py-1 w-full"
                                         />
                                     ) : (
-                                        `${invoice.amount.toFixed(2)}`
+                                        `$${invoice.amount.toFixed(2)}`
+                                    )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Follow-up Date
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {isEditing ? (
+                                        <input
+                                            type="date"
+                                            name="followUpDate"
+                                            value={editedInvoice.followUpDate}
+                                            onChange={handleInputChange}
+                                            className="border rounded px-2 py-1 w-full"
+                                        />
+                                    ) : (
+                                        invoice.followUpDate
                                     )}
                                 </td>
                             </tr>

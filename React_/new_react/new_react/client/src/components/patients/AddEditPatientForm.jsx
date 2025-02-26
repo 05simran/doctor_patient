@@ -1,4 +1,32 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import { Upload, X } from "lucide-react";
+
+// Simulated database access
+const getMedicalData = () => {
+    // In a real application, this would be an API call
+    return [
+        {
+            id: 1,
+            problem: "Hypertension",
+            medicines: ["Lisinopril", "Amlodipine"],
+            symptoms: ["Headache", "Dizziness", "Shortness of breath"],
+        },
+        {
+            id: 2,
+            problem: "Diabetes Type 2",
+            medicines: ["Metformin", "Gliclazide"],
+            symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
+        },
+        {
+            id: 3,
+            problem: "Asthma",
+            medicines: ["Albuterol", "Fluticasone"],
+            symptoms: ["Wheezing", "Coughing", "Chest tightness"],
+        },
+    ];
+};
 
 const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
     const [patientData, setPatientData] = useState(
@@ -11,33 +39,14 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
             medicines: [],
             symptoms: [],
             otherNotes: "",
+            prescriptions: [],
         }
     );
-
     const [medicalData, setMedicalData] = useState([]);
+    const [files, setFiles] = useState([]);
 
     useEffect(() => {
-        // Simulated medical data (replace with API call if needed)
-        setMedicalData([
-            {
-                id: 1,
-                problem: "Hypertension",
-                medicines: ["Lisinopril", "Amlodipine"],
-                symptoms: ["Headache", "Dizziness", "Shortness of breath"],
-            },
-            {
-                id: 2,
-                problem: "Diabetes Type 2",
-                medicines: ["Metformin", "Gliclazide"],
-                symptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
-            },
-            {
-                id: 3,
-                problem: "Asthma",
-                medicines: ["Albuterol", "Fluticasone"],
-                symptoms: ["Wheezing", "Coughing", "Chest tightness"],
-            },
-        ]);
+        setMedicalData(getMedicalData());
     }, []);
 
     const handleInputChange = (e) => {
@@ -64,31 +73,25 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleFileChange = (e) => {
+        const newFiles = Array.from(e.target.files);
+        setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    };
+
+    const removeFile = (index) => {
+        setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        try {
-            const url = patient
-                ? `http://localhost:5000/api/patients/${patient.id}`
-                : "http://localhost:5000/api/patients";
-            const method = patient ? "PUT" : "POST";
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(patientData),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to save patient");
-            }
-
-            const data = await response.json();
-            onSubmit(data);
-        } catch (error) {
-            console.error("Error saving patient:", error);
-        }
+        const formData = new FormData();
+        Object.keys(patientData).forEach((key) => {
+            formData.append(key, JSON.stringify(patientData[key]));
+        });
+        files.forEach((file) => {
+            formData.append("prescriptions", file);
+        });
+        onSubmit(formData);
     };
 
     return (
@@ -97,6 +100,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                 {patient ? "Edit Patient" : "Add New Patient"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name and Age fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label
@@ -134,6 +138,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     </div>
                 </div>
 
+                {/* Gender and Phone fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label
@@ -175,6 +180,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     </div>
                 </div>
 
+                {/* Problem field */}
                 <div>
                     <label
                         htmlFor="problem"
@@ -199,6 +205,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     </select>
                 </div>
 
+                {/* Medicines field */}
                 <div>
                     <label
                         htmlFor="medicines"
@@ -224,6 +231,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     </div>
                 </div>
 
+                {/* Symptoms field */}
                 <div>
                     <label
                         htmlFor="symptoms"
@@ -249,6 +257,7 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     </div>
                 </div>
 
+                {/* Other Notes field */}
                 <div>
                     <label
                         htmlFor="otherNotes"
@@ -266,6 +275,74 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                     ></textarea>
                 </div>
 
+                {/* File upload section */}
+                <div>
+                    <label
+                        htmlFor="prescriptions"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Upload Prescriptions
+                    </label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div className="space-y-1 text-center">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="flex text-sm text-gray-600">
+                                <label
+                                    htmlFor="prescriptions"
+                                    className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                                >
+                                    <span>Upload files</span>
+                                    <input
+                                        id="prescriptions"
+                                        name="prescriptions"
+                                        type="file"
+                                        multiple
+                                        className="sr-only"
+                                        onChange={handleFileChange}
+                                    />
+                                </label>
+                                <p className="pl-1">or drag and drop</p>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                PNG, JPG, PDF up to 10MB each
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Display uploaded files */}
+                {files.length > 0 && (
+                    <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            Uploaded Files
+                        </h3>
+                        <ul className="divide-y divide-gray-200">
+                            {files.map((file, index) => (
+                                <li
+                                    key={index}
+                                    className="py-3 flex justify-between items-center"
+                                >
+                                    <div className="flex items-center">
+                                        <span className="ml-2 flex-1 w-0 truncate">
+                                            {file.name}
+                                        </span>
+                                    </div>
+                                    <div className="ml-4 flex-shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFile(index)}
+                                            className="font-medium text-indigo-600 hover:text-indigo-500"
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {/* Form buttons */}
                 <div className="flex justify-end space-x-2">
                     <button
                         type="button"
@@ -281,18 +358,9 @@ const AddEditPatientForm = ({ patient, onSubmit, onCancel }) => {
                         {patient ? "Update Patient" : "Add Patient"}
                     </button>
                 </div>
-
             </form>
         </div>
     );
 };
 
 export default AddEditPatientForm;
-
-
-
-
-
-
-
-

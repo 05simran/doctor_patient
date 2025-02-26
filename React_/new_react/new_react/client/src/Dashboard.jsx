@@ -17,14 +17,23 @@ const Dashboard = ({ onLogout }) => {
 
     const fetchDashboardData = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/dashboard", {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            });
+            const response = await fetch(
+                "http://localhost:5000/api/dashboard",
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
+                    },
+                }
+            );
             const data = await response.json();
-            setStats(data.stats.map(stat => ({
-                ...stat,
-                icon: getIcon(stat.icon),
-            })));
+            setStats(
+                data.stats.map((stat) => ({
+                    ...stat,
+                    icon: getIcon(stat.icon),
+                }))
+            );
             setCommonProblems(data.commonProblems);
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
@@ -47,11 +56,20 @@ const Dashboard = ({ onLogout }) => {
                     >
                         Logout
                     </button>
-                    {currentView === "patients" ? <PatientsView /> :
-                        currentView === "medicalData" ? <MedicalDataManager /> :
-                        currentView === "invoices" ? <InvoicePage /> :
-                        currentView === "medicine" ? <MedicineInventory /> :
-                        <DashboardOverview stats={stats} commonProblems={commonProblems} />}
+                    {currentView === "patients" ? (
+                        <PatientsView />
+                    ) : currentView === "medicalData" ? (
+                        <MedicalDataManager />
+                    ) : currentView === "invoices" ? (
+                        <InvoicePage />
+                    ) : currentView === "medicine" ? (
+                        <MedicineInventory />
+                    ) : (
+                        <DashboardOverview
+                            stats={stats}
+                            commonProblems={commonProblems}
+                        />
+                    )}
                 </div>
             </div>
         </div>
@@ -60,37 +78,58 @@ const Dashboard = ({ onLogout }) => {
 
 const DashboardOverview = ({ stats, commonProblems }) => (
     <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            Dashboard Overview
+        </h1>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => (
-                <div key={stat.title} className="bg-white rounded-lg shadow p-6">
+                <div
+                    key={stat.title}
+                    className="bg-white rounded-lg shadow p-6"
+                >
                     <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium text-gray-500">{stat.title}</h3>
+                        <h3 className="text-sm font-medium text-gray-500">
+                            {stat.title}
+                        </h3>
                         <stat.icon className="h-5 w-5 text-gray-400" />
                     </div>
                     <div className="text-2xl font-bold">
-                        {stat.title === "Amount Collected Today" ? `₹${stat.value}` : stat.value}
+                        {stat.title === "Amount Collected Today"
+                            ? `₹${stat.value}`
+                            : stat.value}
                     </div>
                     <p className="text-xs text-green-500">{stat.trend}</p>
                 </div>
             ))}
         </div>
         <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Common Problems This Month</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Common Problems This Month
+            </h2>
             <div className="overflow-x-auto">
                 <table className="min-w-full">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient Count</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Problem
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Patient Count
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trend
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {commonProblems.map((item, index) => (
                             <tr key={index}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.problem}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.count}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {item.problem}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {item.count}
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span className="flex items-center text-green-500">
                                         <TrendingUp className="h-4 w-4 mr-1" />
